@@ -89,9 +89,16 @@ public class TestBle : MonoBehaviour
 
             while (cts.IsCancellationRequested == false)
             {
-                await Task.Run(() => WriteXY(x, y), token);
-                Debug.Log($"[TestBle] writing x:{x}, y:{y}");
-                await Task.Delay(50, token);
+                try
+                {
+                    await Task.Run(() => WriteXY(x, y), token);
+                    Debug.Log($"[TestBle] writing x:{x}, y:{y}");
+                    await Task.Delay(50, token);
+                }
+                catch
+                {
+                    Debug.Log($"Cancel");
+                }
             }
         }
 

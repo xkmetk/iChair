@@ -16,7 +16,7 @@ MonoBehaviour:
   handTracking: 1
   adaptiveHand: 0
   highFrequencyHand: 0
-  openMRC: 0
+  openMRC: 1
   faceTracking: 0
   lipsyncTracking: 0
   eyeTracking: 0
@@ -34,6 +34,7 @@ MonoBehaviour:
   sceneCapture: 0
   sharedAnchor: 0
   spatialMesh: 0
+  secureMR: 0
   meshLod: 0
   superResolution: 0
   normalSharpening: 0

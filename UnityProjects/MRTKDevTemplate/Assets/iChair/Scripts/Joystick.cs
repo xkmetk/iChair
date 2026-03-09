@@ -37,7 +37,7 @@ namespace PupilLabs
             y += 58;
 
             ble.SetXY(x, y);
-            //Debug.Log($"x: {x}, y:{y}");
+            Debug.Log($"x: {x}, y:{y}");
         }
 
         private void Update() //this will reset wasHit in the end, but wasHit info is from previous frame which should be OK
