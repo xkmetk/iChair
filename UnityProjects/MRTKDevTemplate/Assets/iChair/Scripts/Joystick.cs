@@ -2,8 +2,15 @@ using UnityEngine;
 
 namespace PupilLabs
 {
-    public class Joystick : MonoBehaviour
+    public class Joystick : MonoBehaviour, IEyeCloseStopper
     {
+
+        [SerializeField]
+        private float outOfZoneResetTime = 1f;
+
+        private float outOfZoneTimer = 0f;
+        private bool isOutOfZone = false;
+
         [SerializeField]
         private TestBle ble;
         [SerializeField]
@@ -29,9 +36,8 @@ namespace PupilLabs
             Vector2 origin = defaultPointerPos;
             Vector2 clamped = Vector2.ClampMagnitude(data - origin, maxEffectiveDistance);
 
-            //transform to 0..255
-            int x = Mathf.RoundToInt((clamped.x / maxEffectiveDistance / 2f + 0.5f) * 140); //left right+
-            int y = Mathf.RoundToInt((clamped.y / maxEffectiveDistance / 2f + 0.5f) * 140); //forward+ reverse
+            int x = Mathf.RoundToInt((clamped.x / maxEffectiveDistance / 2f + 0.5f) * 140);
+            int y = Mathf.RoundToInt((clamped.y / maxEffectiveDistance / 2f + 0.5f) * 140);
 
             x += 58;
             y += 58;
@@ -40,34 +46,71 @@ namespace PupilLabs
             Debug.Log($"x: {x}, y:{y}");
         }
 
-        private void Update() //this will reset wasHit in the end, but wasHit info is from previous frame which should be OK
+        private void Update()
         {
-            //send actual values
             SendData(pointer.localPosition);
 
-            //if not hit previous frame stop follow
-            FollowGaze &= wasHit;
-            //OnRaycastHit happens during late update
-            //reset prior
+            float dist = Vector3.Distance(pointer.localPosition, defaultPointerPos);
+            bool outOfZone = !wasHit || dist > maxDistance;
+
+            if (outOfZone)
+            {
+                if (!isOutOfZone)
+                {
+                    isOutOfZone = true;
+                    outOfZoneTimer = 0f;
+                }
+
+                outOfZoneTimer += Time.deltaTime;
+
+                if (outOfZoneTimer >= outOfZoneResetTime)
+                {
+                    FollowGaze = false;
+                    pointer.localPosition = defaultPointerPos;
+                    isOutOfZone = false;
+                    outOfZoneTimer = 0f;
+                }
+            }
+            else
+            {
+                isOutOfZone = false;
+                outOfZoneTimer = 0f;
+                // FollowGaze necháme zapnutý kým sme v zóne a máme hit
+            }
+
             pointer.localPosition = defaultPointerPos;
             wasHit = false;
         }
 
-        public void OnRaycastHit(Vector3 hitPoint) //this will be triggered during LateUpdate, so after we reset wasHit
+        public void OnRaycastHit(Vector3 hitPoint)
         {
             if (FollowGaze)
             {
                 Vector3 targetPos = transform.InverseTransformPoint(hitPoint);
                 targetPos.z = defaultPointerPos.z;
-                pointer.localPosition = targetPos;
 
-                if (Vector3.Distance(targetPos, defaultPointerPos) > maxDistance) //collider can be bigger
+                // Ak je mimo maxDistance, zaklampuj pointer na okraj kruhu
+                // – timer v Update rozhodne, či sa to resetne po 1 sekunde
+                if (Vector3.Distance(targetPos, defaultPointerPos) > maxDistance)
                 {
-                    targetPos = defaultPointerPos;
-                    FollowGaze = false;
+                    Vector3 dir = (targetPos - defaultPointerPos).normalized;
+                    targetPos = defaultPointerPos + dir * maxDistance;
                 }
+
+                pointer.localPosition = targetPos;
             }
             wasHit = true;
+        }
+
+        public void EyeCloseStop()
+        {
+            FollowGaze = false;
+            pointer.localPosition = defaultPointerPos;
+            isOutOfZone = false;
+            outOfZoneTimer = 0f;
+
+            // pošli neutrál (128, 128) do vozíka
+            ble.SetXY(128, 128);
         }
     }
 }
