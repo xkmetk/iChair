@@ -7,6 +7,15 @@ Tento priečinok obsahuje prototypové komponenty pre ovládanie (vozíka / plat
 - **Dve hlavné UX vetvy ovládania**
   - **„Drive mode“ cez tlačidlá a submenu (Slow/Fast)**: `DriveModeGUIController_v2` + `SubmenuAutoHide` + `ButtonHighlightManager` + `BleVehicleController`
   - **„Gaze zones“ joystick (inkrementálne úrovne v smere)**: `GazeZoneJoystickV2` + `ArrowStackUI` + `TestBle`
+- **Mapovanie GUI → skripty (aby bolo jasné „čo patrí ku čomu“)**
+  - **`GUI_A`**: `MenuManager`, `BleVehicleController`
+  - **`GUI_B`**: `BleVehicleController`, `DriveModeGUIController_v2`, `ButtonHighlightManager`
+  - **`GUI_C`**: `Joystick`
+  - **`GUI_D`**: `GazeZoneJoystickV2`
+  - **Spoločné**:
+    - všetky GUI používajú `BLE` (posielanie X/Y do `TestBle`)
+    - `GUI_A` a `GUI_B` používajú `BleVehicleController` ako **wrapper** nad `BLE`/`TestBle`
+    - `GUISwitcherPanel` ovláda **prepínanie GUI** (fixácia pohľadom + eye-close stop/switch)
 - **Bezpečnostné STOP správanie**
   - `IEyeCloseStopper` je jednoduché rozhranie, ktoré umožní GUI scénam reagovať na zatvorenie očí jednotne.
   - `GUISwitcherPanel` po zatvorení očí:
