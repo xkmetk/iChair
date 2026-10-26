@@ -88,3 +88,4 @@ Niektoré skripty majú `testMode`:
   - `UIBackplateOuterGeometry/UX.Button.BackplateOuterGeometry`
   - fallback `CompressibleButtonVisuals/FrontPlate`
 
+Tento kód (obsah priečinka `Assets/kristof`) je licencovaný pod **BSD 3-Clause License**.
