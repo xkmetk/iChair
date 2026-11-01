@@ -74,16 +74,17 @@ Mermaid architecture documentation illustrating how hardware, Pupil Labs SDK, MR
 
 The project implements **four distinct user interface paradigms (`GUI_A` – `GUI_D`)** divided into two primary UX branches: **Button/Submenu Discrete Control (`GUI_A`, `GUI_B`)** and **Joystick Gaze Control (`GUI_C`, `GUI_D`)**.
 
-| GUI Variant | Control Paradigm | Primary Scripts | BLE Output Method |
-| :--- | :--- | :--- | :--- |
-| **`GUI_A`** | Discrete Buttons + Submenu Locking | `MenuManager`, `BleVehicleController` | Via `BleVehicleController` → `TestBle` |
-| **`GUI_B`** | State-Driven Drive Mode + Dynamic Turning | `DriveModeGUIController_v2`, `SubmenuAutoHide`, `ButtonHighlightManager`, `BleVehicleController` | Via `BleVehicleController` → `TestBle` |
-| **`GUI_C`** | Continuous Gaze-Following Joystick | `Joystick` (or `BLE`) | Direct proportional `(X, Y)` → `TestBle` |
-| **`GUI_D`** | Incremental Gaze-Zone Joystick | `GazeZoneJoystickV2`, `ArrowStackUI` | Direct stepped `(X, Y)` → `TestBle` |
+| GUI Variant | Control Paradigm | Primary Scripts | BLE Output Method | Video Demo |
+| :--- | :--- | :--- | :--- | :--- |
+| **`GUI_A`** | Discrete Buttons + Submenu Locking | `MenuManager`, `BleVehicleController` | Via `BleVehicleController` → `TestBle` | [Watch GUI_A Demo](https://youtube.com/shorts/IYPTFX0jf8s) |
+| **`GUI_B`** | State-Driven Drive Mode + Dynamic Turning | `DriveModeGUIController_v2`, `SubmenuAutoHide`, `ButtonHighlightManager`, `BleVehicleController` | Via `BleVehicleController` → `TestBle` | [Watch GUI_B Demo](https://youtube.com/shorts/oTmExHp9P5I) |
+| **`GUI_C`** | Continuous Gaze-Following Joystick | `Joystick` (or `BLE`) | Direct proportional `(X, Y)` → `TestBle` | [Watch GUI_C Demo](https://youtube.com/shorts/WrtQzswmAfM) |
+| **`GUI_D`** | Incremental Gaze-Zone Joystick | `GazeZoneJoystickV2`, `ArrowStackUI` | Direct stepped `(X, Y)` → `TestBle` | [Watch GUI_D Demo](https://youtube.com/shorts/mOtVLb6-2ko) |
 
 ---
 
 ### `GUI_A` — Classic Submenu Button Control
+- **Video Demo**: [https://youtube.com/shorts/IYPTFX0jf8s](https://youtube.com/shorts/IYPTFX0jf8s)
 - **Concept**: Uses main directional buttons (`Up`, `Down`, `Left`, `Right`, `Stop`) that expand into speed submenus (`Slow` / `Fast`) when looked at.
 - **How it works (`MenuManager` + `BleVehicleController`)**:
   1. Looking at a primary direction calls `ShowSubMenu(...)`, revealing its `Slow` and `Fast` option buttons.
@@ -92,6 +93,7 @@ The project implements **four distinct user interface paradigms (`GUI_A` – `GU
   4. Triggering `STOP` (via button or closing eyes) calls `ResetAllVisuals()` and stops the wheelchair.
 
 ### `GUI_B` — State-Driven Drive Mode & Dynamic Turning
+- **Video Demo**: [https://youtube.com/shorts/oTmExHp9P5I](https://youtube.com/shorts/oTmExHp9P5I)
 - **Concept**: A context-aware UI state machine designed for smooth driving. Instead of stopping to turn, the user can steer dynamically while driving forward or backward.
 - **How it works (`DriveModeGUIController_v2` + `SubmenuAutoHide` + `ButtonHighlightManager` + `BleVehicleController`)**:
   1. **Idle & Speed Selection**: Looking at `Up`, `Down`, `Left`, or `Right` opens the corresponding `SubmenuAutoHide` panel with a 3-second auto-hide timer.
@@ -100,6 +102,7 @@ The project implements **four distinct user interface paradigms (`GUI_A` – `GU
   4. **Two-Step Stop / Confirm**: Looking at the `Stop` button reveals a `Confirm` button (with a configurable `confirmTimeout`), preventing accidental stops from stray glances, or stops immediately upon confirmation/eye closure.
 
 ### `GUI_C` — Continuous Gaze Joystick
+- **Video Demo**: [https://youtube.com/shorts/WrtQzswmAfM](https://youtube.com/shorts/WrtQzswmAfM)
 - **Concept**: A virtual 2D analog joystick where a pointer continuously follows the user's gaze raycast hit point on a collider plane.
 - **How it works (`Joystick`)**:
   1. Subscribes to `GazeDataVisualizer.onHit`. When `FollowGaze` is active, the pointer moves to the local hit position (clamped to `maxDistance`).
@@ -107,6 +110,7 @@ The project implements **four distinct user interface paradigms (`GUI_A` – `GU
   3. **Safety Auto-Reset**: If gaze leaves the collider or exceeds `maxDistance` for longer than `outOfZoneResetTime` (default `1.0s`), `FollowGaze` disables and the pointer snaps back to neutral `(128, 128)`.
 
 ### `GUI_D` — Incremental Gaze-Zone Joystick
+- **Video Demo**: [https://youtube.com/shorts/mOtVLb6-2ko](https://youtube.com/shorts/mOtVLb6-2ko)
 - **Concept**: A discrete, step-based virtual joystick controlled by briefly glancing at the outer edges of a tracking area, with visual feedback provided by stacked arrows.
 - **How it works (`GazeZoneJoystickV2` + `ArrowStackUI`)**:
   1. The tracking area is divided into a central neutral area and 4 outer activation zones: `Left`, `Right`, `Up`, and `Down` (defined by `horizontalActivationEdge` and `verticalActivationEdge`).
